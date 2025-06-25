@@ -13,22 +13,31 @@
 
 /**
  * @export
- * @interface ApiUsersIdPutRequest
+ * @interface UpdateUserInput
  */
-export interface ApiUsersIdPutRequest {
+export interface UpdateUserInput {
     /**
+     * 用户姓名
      * @type {string}
-     * @memberof ApiUsersIdPutRequest
+     * @memberof UpdateUserInput
      */
     name?: string;
     /**
+     * 用户邮箱
      * @type {string}
-     * @memberof ApiUsersIdPutRequest
+     * @memberof UpdateUserInput
      */
     email?: string;
     /**
+     * 用户年龄
      * @type {number}
-     * @memberof ApiUsersIdPutRequest
+     * @memberof UpdateUserInput
      */
     age?: number;
+    /**
+     * 用户头像URL
+     * @type {string}
+     * @memberof UpdateUserInput
+     */
+    avatar?: string;
 }

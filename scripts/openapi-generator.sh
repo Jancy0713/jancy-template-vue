@@ -1,4 +1,4 @@
-swaggerDirName="swagger-service"
+swaggerDirName="src/service/swagger-service"
 # swagger地址
 baseUrl="http://192.168.50.79:3000/api-docs/swagger.json"
 

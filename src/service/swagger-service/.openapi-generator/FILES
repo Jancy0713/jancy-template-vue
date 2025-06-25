@@ -31,7 +31,6 @@ models/ApiTodosIdDelete200Response.ts
 models/ApiTodosPost201Response.ts
 models/ApiTodosReorderPost200Response.ts
 models/ApiTodosReorderPostRequest.ts
-models/ApiUsersIdPutRequest.ts
 models/AuthResponse.ts
 models/AuthResponseData.ts
 models/CreateTagData.ts
@@ -52,6 +51,7 @@ models/TodoStats.ts
 models/TodoStatsTagStatsInner.ts
 models/UpdateTagData.ts
 models/UpdateTodoData.ts
+models/UpdateUserInput.ts
 models/UpdateUserRequest.ts
 models/User.ts
 models/UserInput.ts

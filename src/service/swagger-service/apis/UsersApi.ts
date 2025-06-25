@@ -17,8 +17,8 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     ApiResponse,
-    ApiUsersIdPutRequest,
     ErrorResponse,
+    UpdateUserInput,
     UserInput,
 } from '../models';
 
@@ -32,7 +32,7 @@ export interface ApiUsersIdGetRequest {
 
 export interface ApiUsersIdPutRequest {
     id: number;
-    apiUsersIdPutRequest: ApiUsersIdPutRequest;
+    updateUserInput: UpdateUserInput;
 }
 
 export interface ApiUsersPostRequest {
@@ -91,11 +91,11 @@ export class UsersApi extends BaseAPI {
      * 根据用户ID更新用户信息
      * 更新用户信息
      */
-    apiUsersIdPut({ id, apiUsersIdPutRequest }: ApiUsersIdPutRequest): Observable<ApiResponse>
-    apiUsersIdPut({ id, apiUsersIdPutRequest }: ApiUsersIdPutRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiResponse>>
-    apiUsersIdPut({ id, apiUsersIdPutRequest }: ApiUsersIdPutRequest, opts?: OperationOpts): Observable<ApiResponse | AjaxResponse<ApiResponse>> {
+    apiUsersIdPut({ id, updateUserInput }: ApiUsersIdPutRequest): Observable<ApiResponse>
+    apiUsersIdPut({ id, updateUserInput }: ApiUsersIdPutRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiResponse>>
+    apiUsersIdPut({ id, updateUserInput }: ApiUsersIdPutRequest, opts?: OperationOpts): Observable<ApiResponse | AjaxResponse<ApiResponse>> {
         throwIfNullOrUndefined(id, 'id', 'apiUsersIdPut');
-        throwIfNullOrUndefined(apiUsersIdPutRequest, 'apiUsersIdPutRequest', 'apiUsersIdPut');
+        throwIfNullOrUndefined(updateUserInput, 'updateUserInput', 'apiUsersIdPut');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export class UsersApi extends BaseAPI {
             url: '/api/users/{id}'.replace('{id}', encodeURI(id)),
             method: 'PUT',
             headers,
-            body: apiUsersIdPutRequest,
+            body: updateUserInput,
         }, opts?.responseOpts);
     };
 
