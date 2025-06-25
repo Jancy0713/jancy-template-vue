@@ -14,4 +14,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    host: true, // 启用局域网访问
+    port: 5000, // 设置固定端口
+    open: false, // 不自动打开浏览器
+  },
 })
