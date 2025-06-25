@@ -1,25 +1,25 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    :title="todo ? '编辑任务' : '新增任务'"
+    :title="todo ? t('todo.form.editTitle') : t('todo.form.createTitle')"
     width="600px"
     @close="$emit('cancel')"
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-      <el-form-item label="任务标题" prop="title">
+      <el-form-item :label="t('todo.form.title')" prop="title">
         <el-input
           v-model="form.title"
-          placeholder="请输入任务标题"
+          :placeholder="t('todo.form.titlePlaceholder')"
           maxlength="100"
           show-word-limit
         />
       </el-form-item>
 
-      <el-form-item label="任务描述" prop="description">
+      <el-form-item :label="t('todo.form.description')" prop="description">
         <el-input
           v-model="form.description"
           type="textarea"
-          placeholder="请输入任务描述（可选）"
+          :placeholder="t('todo.form.descriptionPlaceholder')"
           :rows="3"
           maxlength="500"
           show-word-limit
@@ -28,20 +28,20 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="优先级" prop="priority">
+          <el-form-item :label="t('todo.form.priority')" prop="priority">
             <el-select v-model="form.priority" style="width: 100%">
-              <el-option label="高优先级" value="high" />
-              <el-option label="中优先级" value="medium" />
-              <el-option label="低优先级" value="low" />
+              <el-option :label="t('todo.form.priorities.high')" value="high" />
+              <el-option :label="t('todo.form.priorities.medium')" value="medium" />
+              <el-option :label="t('todo.form.priorities.low')" value="low" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="截止日期" prop="dueDate">
+          <el-form-item :label="t('todo.form.dueDate')" prop="dueDate">
             <el-date-picker
               v-model="form.dueDate"
               type="date"
-              placeholder="选择截止日期"
+              :placeholder="t('todo.form.dueDatePlaceholder')"
               style="width: 100%"
               :disabled-date="disabledDate"
             />
@@ -49,8 +49,13 @@
         </el-col>
       </el-row>
 
-      <el-form-item label="标签" prop="tags">
-        <el-select v-model="form.tags" multiple placeholder="选择标签" style="width: 100%">
+      <el-form-item :label="t('todo.form.tags')" prop="tags">
+        <el-select
+          v-model="form.tags"
+          multiple
+          :placeholder="t('todo.form.tagsPlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="tag in tagStore.tags" :key="tag.id" :label="tag.name" :value="tag.id">
             <div class="tag-option">
               <el-tag
@@ -70,9 +75,9 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="$emit('cancel')">取消</el-button>
+      <el-button @click="$emit('cancel')">{{ t('common.cancel') }}</el-button>
       <el-button type="primary" @click="handleSubmit">
-        {{ todo ? '更新' : '创建' }}
+        {{ todo ? t('todo.form.actions.update') : t('todo.form.actions.create') }}
       </el-button>
     </template>
   </el-dialog>
@@ -80,6 +85,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   ElDialog,
   ElForm,
@@ -112,6 +118,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const { t } = useI18n()
+
 const tagStore = useTagStore()
 
 const formRef = ref<FormInstance>()
@@ -125,7 +133,7 @@ const form = reactive({
 })
 
 const rules: FormRules = {
-  title: [{ required: true, message: '请输入任务标题', trigger: 'blur' }],
+  title: [{ required: true, message: t('todo.form.validation.titleRequired'), trigger: 'blur' }],
 }
 
 const dialogVisible = computed({
@@ -170,10 +178,18 @@ const handleSubmit = async () => {
   await formRef.value.validate((valid) => {
     if (valid) {
       const todoData = {
-        ...form,
-        id: props.todo?.id,
+        title: form.title,
+        description: form.description,
+        priority: form.priority,
+        dueDate: form.dueDate,
+        tags: form.tags,
       }
-      emit('submit', todoData)
+
+      if (props.todo?.id) {
+        emit('submit', { ...todoData, id: props.todo.id })
+      } else {
+        emit('submit', todoData)
+      }
       resetForm()
     }
   })

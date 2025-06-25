@@ -20,15 +20,31 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
-  
+
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
   skipFormatting,
+  {
+    name: 'app/custom-rules',
+    files: ['**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off', // 完全禁用any检查
+    },
+  },
+  {
+    name: 'app/custom-rules-for-swagger-service',
+    files: ['swagger-service/**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off', // 完全禁用未使用变量检查
+      '@typescript-eslint/prefer-as-const': 'off', // 完全禁用as const检查
+      '@typescript-eslint/no-empty-object-type': 'off', // 完全禁用空对象类型检查
+    },
+  },
 )

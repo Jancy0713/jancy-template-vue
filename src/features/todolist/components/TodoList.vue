@@ -5,12 +5,12 @@
         <el-icon :color="statusConfig.color" :size="18">
           <component :is="statusConfig.icon" />
         </el-icon>
-        {{ statusConfig.title }}
-        <span class="todo-count">{{ todos.length }} 个任务</span>
+        {{ t(`todo.status.${status}`) }}
+        <span class="todo-count">{{ t('todo.list.taskCount', { count: todos.length }) }}</span>
       </h3>
 
       <el-button v-if="status === 'completed'" type="text" size="small" @click="toggleShowAll">
-        {{ showAllCompleted ? '只看今天' : '查看全部' }}
+        {{ t(showAllCompleted ? 'todo.list.showToday' : 'todo.list.showAll') }}
       </el-button>
     </div>
 
@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElButton, ElIcon, ElEmpty } from 'element-plus'
 import { Clock, Loading, Check } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
@@ -88,23 +89,21 @@ interface DragChangeEvent {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const todoStore = useTodoStore()
+const { t } = useI18n()
 
 const showAllCompleted = ref(false)
 
 const statusConfig = computed(() => {
   const configs = {
     pending: {
-      title: '待办',
       color: '#909399',
       icon: Clock,
     },
     'in-progress': {
-      title: '进行中',
       color: '#409EFF',
       icon: Loading,
     },
     completed: {
-      title: '已完成',
       color: '#67C23A',
       icon: Check,
     },
@@ -130,13 +129,17 @@ const displayTodos = computed(() => {
 const emptyText = computed(() => {
   switch (props.status) {
     case 'pending':
-      return '暂无待办任务'
+      return t('todo.list.empty.pending')
     case 'in-progress':
-      return '暂无进行中的任务'
+      return t('todo.list.empty.inProgress')
     case 'completed':
-      return showAllCompleted.value ? '暂无已完成任务' : '今天还没有完成任务'
+      return t(
+        showAllCompleted.value
+          ? 'todo.list.empty.completed.all'
+          : 'todo.list.empty.completed.today',
+      )
     default:
-      return '暂无任务'
+      return t('common.noData')
   }
 })
 

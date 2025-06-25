@@ -1,23 +1,6 @@
 <template>
   <div class="todo-view">
-    <!-- 头部 -->
-    <el-header class="todo-header">
-      <div class="todo-header__content">
-        <h1 class="todo-header__title">
-          <el-icon :size="24" color="#409EFF">
-            <Calendar />
-          </el-icon>
-          待办清单
-        </h1>
-
-        <div class="todo-header__actions">
-          <el-button type="primary" @click="showAddDialog = true">
-            <el-icon><Plus /></el-icon>
-            新增任务
-          </el-button>
-        </div>
-      </div>
-    </el-header>
+    <app-header> </app-header>
 
     <!-- 工具栏 -->
     <div class="todo-toolbar">
@@ -25,7 +8,7 @@
         <div class="todo-toolbar__left">
           <el-input
             v-model="searchKeyword"
-            placeholder="搜索任务..."
+            :placeholder="t('todo.search.placeholder')"
             clearable
             style="width: 300px"
           >
@@ -36,22 +19,26 @@
 
           <el-button @click="showFilterDialog = true">
             <el-icon><Filter /></el-icon>
-            筛选
+            {{ t('todo.filter.title') }}
           </el-button>
 
           <el-select v-model="currentSort" style="width: 150px" @change="handleSortChange">
-            <el-option label="自定义排序" value="order:asc" />
-            <el-option label="优先级排序" value="priority:desc" />
-            <el-option label="创建时间" value="createdAt:desc" />
-            <el-option label="更新时间" value="updatedAt:desc" />
-            <el-option label="截止时间" value="dueDate:asc" />
+            <el-option :label="t('todo.sort.custom')" value="order:asc" />
+            <el-option :label="t('todo.sort.priority')" value="priority:desc" />
+            <el-option :label="t('todo.sort.createdAt')" value="createdAt:desc" />
+            <el-option :label="t('todo.sort.updatedAt')" value="updatedAt:desc" />
+            <el-option :label="t('todo.sort.dueDate')" value="dueDate:asc" />
           </el-select>
         </div>
 
         <div class="todo-toolbar__right">
           <el-button @click="showTagManager = true">
             <el-icon><Collection /></el-icon>
-            标签管理
+            {{ t('todo.tag.manager.title') }}
+          </el-button>
+          <el-button type="primary" @click="showAddDialog = true">
+            <el-icon><Plus /></el-icon>
+            {{ t('todo.addTask') }}
           </el-button>
         </div>
       </div>
@@ -134,8 +121,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
-  ElHeader,
   ElMain,
   ElButton,
   ElInput,
@@ -145,7 +132,8 @@ import {
   ElMessage,
   ElMessageBox,
 } from 'element-plus'
-import { Calendar, Plus, Search, Filter, Collection } from '@element-plus/icons-vue'
+import { Plus, Search, Filter, Collection } from '@element-plus/icons-vue'
+import AppHeader from '@/components/AppHeader.vue'
 
 import TodoList from '../components/TodoList.vue'
 import TodoForm from '../components/TodoForm.vue'
@@ -162,6 +150,7 @@ import type { FilterOptions, SortOptions } from '../types/common'
 
 const todoStore = useTodoStore()
 const tagStore = useTagStore()
+const { t } = useI18n()
 
 // 响应式状态
 const showAddDialog = ref(false)
@@ -186,14 +175,14 @@ const handleEdit = (todo: Todo) => {
 
 const handleDelete = async (id: string) => {
   try {
-    await ElMessageBox.confirm('确定要删除这个任务吗？', '确认删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('todo.dialog.deleteConfirm'), t('todo.dialog.deleteTitle'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
 
     if (todoStore.deleteTodo(id)) {
-      ElMessage.success('任务删除成功')
+      ElMessage.success(t('todo.dialog.deleteSuccess'))
     }
   } catch {
     // 用户取消删除
@@ -204,54 +193,34 @@ const handleToggle = (id: string) => {
   const result = todoStore.toggleTodoStatus(id)
   if (result) {
     const statusText = {
-      pending: '待办',
-      'in-progress': '进行中',
-      completed: '已完成',
+      pending: t('todo.status.pending'),
+      'in-progress': t('todo.status.inProgress'),
+      completed: t('todo.status.completed'),
     }
-    ElMessage.success(`任务状态已更新为：${statusText[result.status]}`)
+    ElMessage.success(`${t('common.success')}：${statusText[result.status]}`)
   }
 }
 
-const handleReorder = (todos: Todo[]) => {
-  // 更新所有相关任务的顺序
-  const status = todos[0]?.status
-  if (!status) return
-
-  // 获取相同状态的所有任务
-  const statusTodos = todoStore.todos.filter((t) => t.status === status)
-
-  // 更新顺序
-  statusTodos.forEach((todo) => {
-    const newTodo = todos.find((t) => t.id === todo.id)
-    if (newTodo) {
-      todoStore.updateTodo(todo.id, {
-        order: todos.findIndex((t) => t.id === todo.id),
-        status: newTodo.status,
-      })
-    } else {
-      // 如果任务不在新列表中，将其顺序设置为最后
-      todoStore.updateTodo(todo.id, {
-        order: todos.length + statusTodos.length,
-      })
-    }
-  })
+const handleReorder = (status: string, ids: string[]) => {
+  todoStore.reorderTodos(status as Todo['status'], ids)
 }
 
 const handleSubmit = (data: CreateTodoData | UpdateTodoData) => {
-  try {
-    if (editingTodo.value) {
-      // 编辑模式
-      todoStore.updateTodo(editingTodo.value.id, data as UpdateTodoData)
-      ElMessage.success('任务更新成功')
-    } else {
-      // 新增模式
-      todoStore.addTodo(data as CreateTodoData)
-      ElMessage.success('任务创建成功')
+  if ('id' in data) {
+    // 更新任务
+    const result = todoStore.updateTodo(data.id, data)
+    if (result) {
+      ElMessage.success(t('todo.dialog.updateSuccess'))
+      showAddDialog.value = false
+      editingTodo.value = null
     }
-    handleCancel()
-  } catch (error) {
-    ElMessage.error('操作失败，请重试')
-    console.error('Submit error:', error)
+  } else {
+    // 创建任务
+    const result = todoStore.addTodo(data)
+    if (result) {
+      ElMessage.success(t('todo.dialog.createSuccess'))
+      showAddDialog.value = false
+    }
   }
 }
 
@@ -261,7 +230,7 @@ const handleCancel = () => {
 }
 
 const handleSortChange = (value: string) => {
-  const [field, order] = value.split(':') as [SortOptions['field'], SortOptions['order']]
+  const [field, order] = value.split(':') as [keyof SortOptions, 'asc' | 'desc']
   todoStore.setSort({ field, order })
 }
 
@@ -280,136 +249,74 @@ const handleShowHistory = (todo: Todo) => {
   showHistoryDialog.value = true
 }
 
-const handleTodoDetailUpdate = (todo: Partial<Todo>) => {
-  if (todo.id) {
-    todoStore.updateTodo(todo.id, todo)
+const handleTodoDetailUpdate = (data: UpdateTodoData) => {
+  if (todoStore.updateTodo(data)) {
+    ElMessage.success(t('todo.dialog.updateSuccess'))
+    showTodoDetail.value = false
   }
 }
 
 // 监听搜索关键词变化
-watch(searchKeyword, (keyword) => {
-  todoStore.setFilters({ ...filters.value, keyword })
+watch(searchKeyword, (value) => {
+  todoStore.setSearchKeyword(value)
 })
 
 // 初始化
 onMounted(() => {
-  todoStore.loadData()
-  tagStore.loadData()
-
-  // 如果是首次使用，初始化示例数据
-  initializeSampleData(todoStore, tagStore)
+  // 如果没有任何数据，初始化示例数据
+  if (todoStore.todos.length === 0 && tagStore.tags.length === 0) {
+    initializeSampleData(todoStore, tagStore)
+  }
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .todo-view {
   min-height: 100vh;
-  background: var(--el-bg-color-page);
-}
-
-.todo-header {
-  background: white;
-  border-bottom: 1px solid var(--el-border-color-light);
-  padding: 0;
-  height: auto;
-}
-
-.todo-header__content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 24px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  flex-direction: column;
+  background-color: var(--el-bg-color-page);
 
-.todo-header__title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--el-text-color-primary);
-}
+  .todo-toolbar {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--el-border-color-light);
+    background-color: var(--el-bg-color);
 
-.todo-toolbar {
-  background: white;
-  border-bottom: 1px solid var(--el-border-color-light);
-  padding: 16px 0;
-}
+    &__content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
 
-.todo-toolbar__content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    &__left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-.todo-toolbar__left,
-.todo-toolbar__right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.todo-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.todo-boards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 24px;
-  align-items: start;
-}
-
-.todo-board {
-  min-height: 400px;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .todo-header__content {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .todo-toolbar__content {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .todo-toolbar__left,
-  .todo-toolbar__right {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .todo-boards {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
   }
 
   .todo-main {
-    padding: 16px;
+    flex: 1;
+    padding: 24px;
+    overflow: auto;
   }
-}
 
-/* 深色模式适配 */
-.dark .todo-header {
-  background: var(--el-bg-color);
-  border-bottom-color: var(--el-border-color);
-}
+  .todo-boards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    height: 100%;
+  }
 
-.dark .todo-toolbar {
-  background: var(--el-bg-color);
-  border-bottom-color: var(--el-border-color);
+  .todo-board {
+    min-height: 200px;
+  }
 }
 </style>

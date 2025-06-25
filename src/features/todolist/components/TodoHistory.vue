@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="操作历史"
+    :title="t('todo.history.title')"
     width="600px"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
@@ -15,10 +15,14 @@
           :type="getTimelineItemType(record.actionType)"
         >
           <div class="history-item">
-            <div class="history-item__title">{{ getActionText(record.actionType) }}</div>
+            <div class="history-item__title">
+              {{ t(`todo.history.actions.${record.actionType}`) }}
+            </div>
             <div v-if="record.changes" class="history-item__changes">
               <div class="history-item__change">
-                <span class="history-item__field">{{ getFieldText(record.changes.field) }}：</span>
+                <span class="history-item__field"
+                  >{{ t(`todo.history.fields.${record.changes.field}`) }}：</span
+                >
                 <template v-if="record.changes.field === 'status'">
                   <el-tag size="small" type="info" class="history-item__old-value">
                     {{ getStatusText(String(record.changes.oldValue || '')) }}
@@ -65,6 +69,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElDialog, ElTimeline, ElTimelineItem, ElTag, ElIcon } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import type { Todo, HistoryActionType, HistoryChangeValue } from '../types/todo'
@@ -79,19 +84,10 @@ interface Emits {
   (e: 'update:visible', value: boolean): void
 }
 
-type FieldType =
-  | 'status'
-  | 'priority'
-  | 'title'
-  | 'description'
-  | 'tags'
-  | 'dueDate'
-  | 'order'
-  | string
-
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const tagStore = useTagStore()
+const { t } = useI18n()
 
 const dialogVisible = computed({
   get: () => props.visible,
@@ -107,19 +103,6 @@ const sortedHistory = computed(() => {
     }))
     .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 })
-
-const getFieldText = (field: FieldType): string => {
-  const fieldMap: Record<FieldType, string> = {
-    title: '标题',
-    description: '描述',
-    status: '状态',
-    priority: '优先级',
-    tags: '标签',
-    dueDate: '截止日期',
-    order: '排序',
-  }
-  return fieldMap[field] || String(field)
-}
 
 const getTimelineItemType = (
   actionType: HistoryActionType,
@@ -140,36 +123,20 @@ const getTimelineItemType = (
   return typeMap[actionType] || 'info'
 }
 
-const getActionText = (actionType: HistoryActionType): string => {
-  const textMap: Record<HistoryActionType, string> = {
-    create: '创建任务',
-    update_title: '更新标题',
-    update_description: '更新描述',
-    update_status: '更新状态',
-    update_priority: '更新优先级',
-    update_tags: '更新标签',
-    update_due_date: '更新截止日期',
-    update_order: '调整顺序',
-    complete: '完成任务',
-    delete: '删除任务',
-  }
-  return textMap[actionType] || actionType
-}
-
 const getStatusText = (status: string): string => {
   const statusMap: Record<string, string> = {
-    pending: '待办',
-    'in-progress': '进行中',
-    completed: '已完成',
+    pending: t('todo.history.status.pending'),
+    'in-progress': t('todo.history.status.inProgress'),
+    completed: t('todo.history.status.completed'),
   }
   return statusMap[status] || status
 }
 
 const getPriorityText = (priority: string): string => {
   const priorityMap: Record<string, string> = {
-    high: '高',
-    medium: '中',
-    low: '低',
+    high: t('todo.history.priority.high'),
+    medium: t('todo.history.priority.medium'),
+    low: t('todo.history.priority.low'),
   }
   return priorityMap[priority] || priority
 }
@@ -185,7 +152,7 @@ const getPriorityType = (priority: string): 'danger' | 'warning' | 'info' => {
 
 const formatValue = (value: HistoryChangeValue, fieldName: string): string => {
   if (value === null || value === undefined) {
-    return '无'
+    return t('todo.history.noValue')
   }
   if (value instanceof Date) {
     return formatTime(value)
@@ -196,16 +163,12 @@ const formatValue = (value: HistoryChangeValue, fieldName: string): string => {
       const tagNames = value
         .map((tagId) => {
           const tag = tagStore.getTagById(tagId as string)
-          return tag ? tag.name : '已删除的标签'
+          return tag ? tag.name : t('todo.history.deletedTag')
         })
-        .filter(Boolean)
-      return tagNames.length > 0 ? tagNames.join(', ') : '无标签'
+        .join(', ')
+      return tagNames || t('todo.history.noValue')
     }
-    return value.join(', ')
-  }
-  // 如果是数字且字段名包含 order，显示为"位置 X"
-  if (typeof value === 'number' && fieldName.includes('order')) {
-    return `位置 ${value + 1}`
+    return value.join(', ') || t('todo.history.noValue')
   }
   return String(value)
 }

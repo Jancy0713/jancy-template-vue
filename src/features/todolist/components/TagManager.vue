@@ -1,20 +1,25 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="标签管理" width="600px" @closed="resetForm">
+  <el-dialog
+    v-model="dialogVisible"
+    :title="t('todo.tag.manager.title')"
+    width="600px"
+    @closed="resetForm"
+  >
     <div class="tag-manager">
       <!-- 添加新标签表单 -->
       <div class="tag-form">
-        <h4>添加新标签</h4>
+        <h4>{{ t('todo.tag.manager.addNew') }}</h4>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-          <el-form-item label="标签名称" prop="name">
+          <el-form-item :label="t('todo.tag.manager.name')" prop="name">
             <el-input
               v-model="form.name"
-              placeholder="请输入标签名称"
+              :placeholder="t('todo.tag.manager.namePlaceholder')"
               maxlength="20"
               show-word-limit
               @keyup.enter="handleSubmit"
             />
           </el-form-item>
-          <el-form-item label="标签颜色" prop="color">
+          <el-form-item :label="t('todo.tag.manager.color')" prop="color">
             <div class="color-selector">
               <div class="preset-colors">
                 <div
@@ -31,18 +36,24 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="handleSubmit" :loading="submitting">
-              {{ editingTag ? '更新' : '添加' }}
+              {{
+                editingTag
+                  ? t('todo.tag.manager.actions.update')
+                  : t('todo.tag.manager.actions.add')
+              }}
             </el-button>
-            <el-button v-if="editingTag" @click="resetForm">取消编辑</el-button>
+            <el-button v-if="editingTag" @click="resetForm">{{
+              t('todo.tag.manager.actions.cancelEdit')
+            }}</el-button>
           </el-form-item>
         </el-form>
       </div>
 
       <!-- 标签列表 -->
       <div class="tag-list">
-        <h4>已有标签</h4>
+        <h4>{{ t('todo.tag.manager.existingTags') }}</h4>
         <div v-if="tags.length === 0" class="empty-state">
-          <el-empty description="暂无标签" :image-size="80" />
+          <el-empty :description="t('todo.tag.manager.noTags')" :image-size="80" />
         </div>
         <div v-else class="tag-items">
           <div v-for="tag in tags" :key="tag.id" class="tag-item">
@@ -50,17 +61,21 @@
               <el-tag :color="tag.color" :style="{ color: getTextColor(tag.color) }" size="large">
                 {{ tag.name }}
               </el-tag>
-              <span class="tag-count">{{ getTagUsageCount(tag.id) }} 个任务</span>
+              <span class="tag-count">{{
+                t('todo.tag.manager.taskCount', { count: getTagUsageCount(tag.id) })
+              }}</span>
             </div>
             <div class="tag-actions">
-              <el-button type="text" size="small" @click="handleEdit(tag)"> 编辑 </el-button>
+              <el-button type="text" size="small" @click="handleEdit(tag)">
+                {{ t('todo.tag.manager.actions.edit') }}
+              </el-button>
               <el-button
                 type="text"
                 size="small"
                 @click="handleDelete(tag)"
                 :disabled="getTagUsageCount(tag.id) > 0"
               >
-                删除
+                {{ t('todo.tag.manager.actions.delete') }}
               </el-button>
             </div>
           </div>
@@ -69,13 +84,16 @@
     </div>
 
     <template #footer>
-      <el-button @click="$emit('update:visible', false)">关闭</el-button>
+      <el-button @click="$emit('update:visible', false)">{{
+        t('todo.tag.manager.actions.close')
+      }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   ElDialog,
   ElButton,
@@ -107,6 +125,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const { t } = useI18n()
+
 const tagStore = useTagStore()
 const todoStore = useTodoStore()
 
@@ -122,15 +142,15 @@ const form = reactive({
 
 const rules: FormRules = {
   name: [
-    { required: true, message: '请输入标签名称', trigger: 'blur' },
-    { min: 1, max: 20, message: '标签名称长度为 1-20 个字符', trigger: 'blur' },
+    { required: true, message: t('todo.tag.manager.validation.nameRequired'), trigger: 'blur' },
+    { min: 1, max: 20, message: t('todo.tag.manager.validation.nameLength'), trigger: 'blur' },
     {
       validator: (rule, value, callback) => {
         const existingTag = tags.value.find(
           (tag) => tag.name === value && tag.id !== editingTag.value?.id,
         )
         if (existingTag) {
-          callback(new Error('标签名称已存在'))
+          callback(new Error(t('todo.tag.manager.validation.nameExists')))
         } else {
           callback()
         }
@@ -138,7 +158,9 @@ const rules: FormRules = {
       trigger: 'blur',
     },
   ],
-  color: [{ required: true, message: '请选择标签颜色', trigger: 'change' }],
+  color: [
+    { required: true, message: t('todo.tag.manager.validation.colorRequired'), trigger: 'change' },
+  ],
 }
 
 // 预设颜色
@@ -189,11 +211,11 @@ const handleSubmit = async () => {
     if (editingTag.value) {
       // 编辑模式
       tagStore.updateTag(editingTag.value.id, tagData)
-      ElMessage.success('标签更新成功')
+      ElMessage.success(t('todo.tag.manager.messages.updateSuccess'))
     } else {
       // 新增模式
       tagStore.addTag(tagData)
-      ElMessage.success('标签创建成功')
+      ElMessage.success(t('todo.tag.manager.messages.createSuccess'))
     }
 
     resetForm()
@@ -212,14 +234,14 @@ const handleEdit = (tag: Tag) => {
 
 const handleDelete = async (tag: Tag) => {
   try {
-    await ElMessageBox.confirm(`确定要删除标签"${tag.name}"吗？`, '确认删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('todo.tag.manager.messages.deleteConfirm'), t('common.confirm'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
 
     if (tagStore.deleteTag(tag.id)) {
-      ElMessage.success('标签删除成功')
+      ElMessage.success(t('todo.tag.manager.messages.deleteSuccess'))
     }
   } catch {
     // 用户取消删除

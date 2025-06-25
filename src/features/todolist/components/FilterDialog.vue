@@ -1,27 +1,42 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="筛选条件" width="600px">
+  <el-dialog v-model="dialogVisible" :title="t('todo.filter.title')" width="600px">
     <el-form :model="form" label-width="100px">
       <!-- 优先级筛选 -->
-      <el-form-item label="优先级">
-        <el-select v-model="form.priority" multiple placeholder="选择优先级" style="width: 100%">
-          <el-option label="高优先级" value="high" />
-          <el-option label="中优先级" value="medium" />
-          <el-option label="低优先级" value="low" />
+      <el-form-item :label="t('todo.filter.priority')">
+        <el-select
+          v-model="form.priority"
+          multiple
+          :placeholder="t('todo.filter.priorityPlaceholder')"
+          style="width: 100%"
+        >
+          <el-option :label="t('todo.form.priorities.high')" value="high" />
+          <el-option :label="t('todo.form.priorities.medium')" value="medium" />
+          <el-option :label="t('todo.form.priorities.low')" value="low" />
         </el-select>
       </el-form-item>
 
       <!-- 状态筛选 -->
-      <el-form-item label="状态">
-        <el-select v-model="form.status" multiple placeholder="选择状态" style="width: 100%">
-          <el-option label="待办" value="pending" />
-          <el-option label="进行中" value="in-progress" />
-          <el-option label="已完成" value="completed" />
+      <el-form-item :label="t('todo.filter.status')">
+        <el-select
+          v-model="form.status"
+          multiple
+          :placeholder="t('todo.filter.statusPlaceholder')"
+          style="width: 100%"
+        >
+          <el-option :label="t('todo.status.pending')" value="pending" />
+          <el-option :label="t('todo.status.inProgress')" value="in-progress" />
+          <el-option :label="t('todo.status.completed')" value="completed" />
         </el-select>
       </el-form-item>
 
       <!-- 标签筛选 -->
-      <el-form-item label="标签">
-        <el-select v-model="form.tags" multiple placeholder="选择标签" style="width: 100%">
+      <el-form-item :label="t('todo.filter.tags')">
+        <el-select
+          v-model="form.tags"
+          multiple
+          :placeholder="t('todo.filter.tagsPlaceholder')"
+          style="width: 100%"
+        >
           <el-option v-for="tag in tagStore.tags" :key="tag.id" :label="tag.name" :value="tag.id">
             <div class="tag-option">
               <el-tag
@@ -35,7 +50,9 @@
                 {{ tag.name }}
               </el-tag>
               <div class="tag-count-wrapper">
-                <span class="tag-count">{{ getTagCount(tag.id) }} 个任务</span>
+                <span class="tag-count">{{
+                  t('todo.filter.taskCount', { count: getTagCount(tag.id) })
+                }}</span>
               </div>
             </div>
           </el-option>
@@ -43,19 +60,19 @@
       </el-form-item>
 
       <!-- 日期范围筛选 -->
-      <el-form-item label="日期范围">
+      <el-form-item :label="t('todo.filter.dateRange.label')">
         <div class="date-range-filter">
           <el-select v-model="form.dateRange.type" style="width: 120px">
-            <el-option label="创建时间" value="created" />
-            <el-option label="更新时间" value="updated" />
-            <el-option label="完成时间" value="completed" />
+            <el-option :label="t('todo.filter.dateRange.types.created')" value="created" />
+            <el-option :label="t('todo.filter.dateRange.types.updated')" value="updated" />
+            <el-option :label="t('todo.filter.dateRange.types.completed')" value="completed" />
           </el-select>
           <el-date-picker
             v-model="form.dateRange.range"
             type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+            :range-separator="t('todo.filter.dateRange.rangeSeparator')"
+            :start-placeholder="t('todo.filter.dateRange.startPlaceholder')"
+            :end-placeholder="t('todo.filter.dateRange.endPlaceholder')"
             style="width: 340px"
             value-format="YYYY-MM-DD"
           />
@@ -64,14 +81,17 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClear">清空</el-button>
-      <el-button type="primary" @click="handleApply">应用</el-button>
+      <el-button @click="handleClear">{{ t('todo.filter.actions.clear') }}</el-button>
+      <el-button type="primary" @click="handleApply">{{
+        t('todo.filter.actions.apply')
+      }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   ElDialog,
   ElForm,
@@ -102,6 +122,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const { t } = useI18n()
 
 const tagStore = useTagStore()
 const todoStore = useTodoStore()

@@ -3,7 +3,9 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <RouterView />
+  <router-view />
 </template>
 
-<style scoped lang="scss"></style>
+<style>
+/* 全局样式可以保留在这里 */
+</style>

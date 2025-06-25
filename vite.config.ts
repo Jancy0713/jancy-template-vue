@@ -16,7 +16,13 @@ export default defineConfig({
   },
   server: {
     host: true, // 启用局域网访问
-    port: 5000, // 设置固定端口
+    port: 5170, // 设置固定端口
     open: false, // 不自动打开浏览器
+    proxy: {
+      '/api': {
+        target: 'http://192.168.50.79:3000',
+        changeOrigin: true,
+      },
+    },
   },
 })
