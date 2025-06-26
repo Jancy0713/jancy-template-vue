@@ -2,6 +2,7 @@
 .openapi-generator-ignore
 apis/AuthApi.ts
 apis/HealthApi.ts
+apis/LogsApi.ts
 apis/StatsApi.ts
 apis/TagsApi.ts
 apis/TodosApi.ts
@@ -11,6 +12,10 @@ index.ts
 models/ApiAuthLogoutPost200Response.ts
 models/ApiAuthProfileGet200Response.ts
 models/ApiAuthProfilePut200Response.ts
+models/ApiLogsFilenameGet200Response.ts
+models/ApiLogsFilenameGet200ResponseData.ts
+models/ApiLogsGet200Response.ts
+models/ApiLogsGet200ResponseDataInner.ts
 models/ApiResponse.ts
 models/ApiResponseData.ts
 models/ApiStatsCompletionRateGet200Response.ts
@@ -25,14 +30,13 @@ models/ApiTagsGet200Response.ts
 models/ApiTagsIdDelete200Response.ts
 models/ApiTagsPost201Response.ts
 models/ApiTodosBatchPost200Response.ts
-models/ApiTodosBatchPostRequest.ts
 models/ApiTodosGet200Response.ts
 models/ApiTodosIdDelete200Response.ts
 models/ApiTodosPost201Response.ts
 models/ApiTodosReorderPost200Response.ts
-models/ApiTodosReorderPostRequest.ts
 models/AuthResponse.ts
 models/AuthResponseData.ts
+models/BatchOperation.ts
 models/CreateTagData.ts
 models/CreateTodoData.ts
 models/ErrorResponse.ts
@@ -45,6 +49,7 @@ models/RefreshTokenRequest.ts
 models/RefreshTokenResponse.ts
 models/RefreshTokenResponseData.ts
 models/RegisterRequest.ts
+models/ReorderRequest.ts
 models/Tag.ts
 models/Todo.ts
 models/TodoStats.ts

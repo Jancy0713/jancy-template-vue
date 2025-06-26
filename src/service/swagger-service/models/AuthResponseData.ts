@@ -37,4 +37,16 @@ export interface AuthResponseData {
      * @memberof AuthResponseData
      */
     refreshToken?: string;
+    /**
+     * token过期时间（秒）
+     * @type {number}
+     * @memberof AuthResponseData
+     */
+    expiresIn?: number;
+    /**
+     * refresh token过期时间（秒）
+     * @type {number}
+     * @memberof AuthResponseData
+     */
+    refreshExpiresIn?: number;
 }

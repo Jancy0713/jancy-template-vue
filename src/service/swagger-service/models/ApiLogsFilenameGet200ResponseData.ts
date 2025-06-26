@@ -13,31 +13,27 @@
 
 /**
  * @export
- * @interface RefreshTokenResponseData
+ * @interface ApiLogsFilenameGet200ResponseData
  */
-export interface RefreshTokenResponseData {
+export interface ApiLogsFilenameGet200ResponseData {
     /**
-     * 新的访问令牌
      * @type {string}
-     * @memberof RefreshTokenResponseData
+     * @memberof ApiLogsFilenameGet200ResponseData
      */
-    token?: string;
+    filename?: string;
     /**
-     * 新的刷新令牌
      * @type {string}
-     * @memberof RefreshTokenResponseData
+     * @memberof ApiLogsFilenameGet200ResponseData
      */
-    refreshToken?: string;
+    content?: string;
     /**
-     * token过期时间（秒）
      * @type {number}
-     * @memberof RefreshTokenResponseData
+     * @memberof ApiLogsFilenameGet200ResponseData
      */
-    expiresIn?: number;
+    totalLines?: number;
     /**
-     * refresh token过期时间（秒）
      * @type {number}
-     * @memberof RefreshTokenResponseData
+     * @memberof ApiLogsFilenameGet200ResponseData
      */
-    refreshExpiresIn?: number;
+    returnedLines?: number;
 }

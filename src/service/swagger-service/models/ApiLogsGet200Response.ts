@@ -11,15 +11,23 @@
  * Do not edit the class manually.
  */
 
+import type {
+    ApiLogsGet200ResponseDataInner,
+} from './';
+
 /**
  * @export
- * @interface ApiTodosReorderPostRequest
+ * @interface ApiLogsGet200Response
  */
-export interface ApiTodosReorderPostRequest {
+export interface ApiLogsGet200Response {
     /**
-     * 按新顺序排列的任务ID列表
-     * @type {Array<string>}
-     * @memberof ApiTodosReorderPostRequest
+     * @type {boolean}
+     * @memberof ApiLogsGet200Response
      */
-    todoIds: Array<string>;
+    success?: boolean;
+    /**
+     * @type {Array<ApiLogsGet200ResponseDataInner>}
+     * @memberof ApiLogsGet200Response
+     */
+    data?: Array<ApiLogsGet200ResponseDataInner>;
 }

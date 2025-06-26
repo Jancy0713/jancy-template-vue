@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/features/theme/stores/theme'
 import { useAuthStore } from '@/stores/auth'
 import { ElDropdown } from 'element-plus'
@@ -8,12 +9,17 @@ import logo from '@/assets/logo.svg'
 import AuthDialog from './auth/AuthDialog.vue'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 
 const showLoginDialog = ref(false)
 const isLoginMode = ref(true)
 const isLoggedIn = computed(() => !!authStore.token)
+
+const goHome = () => {
+  router.push('/')
+}
 
 const toggleTheme = () => {
   themeStore.toggleTheme()
@@ -50,7 +56,7 @@ const handleCommand = (command: string) => {
 
 <template>
   <header class="app-header">
-    <div class="left">
+    <div class="left" role="button" @click="goHome">
       <img :src="logo" alt="Logo" class="logo" />
       <h1 class="title">{{ t('app.title') }}</h1>
     </div>
@@ -73,7 +79,7 @@ const handleCommand = (command: string) => {
       <template v-else>
         <el-dropdown trigger="click" @command="handleCommand">
           <el-avatar :size="32" :src="authStore.userInfo?.avatar">
-            {{ authStore.userInfo?.nickname?.charAt(0) }}
+            {{ authStore.userInfo?.name?.charAt(0) }}
           </el-avatar>
 
           <template #dropdown>
@@ -111,6 +117,12 @@ const handleCommand = (command: string) => {
     display: flex;
     align-items: center;
     gap: 12px;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
 
     .logo {
       height: 32px;

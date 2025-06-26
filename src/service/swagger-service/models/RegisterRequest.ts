@@ -17,13 +17,13 @@
  */
 export interface RegisterRequest {
     /**
-     * 用户姓名
+     * 用户姓名（可选，默认使用邮箱前缀）
      * @type {string}
      * @memberof RegisterRequest
      */
-    name: string;
+    name?: string;
     /**
-     * 用户邮箱
+     * 用户邮箱（必须唯一）
      * @type {string}
      * @memberof RegisterRequest
      */

@@ -1,5 +1,6 @@
 export * from './AuthApi';
 export * from './HealthApi';
+export * from './LogsApi';
 export * from './StatsApi';
 export * from './TagsApi';
 export * from './TodosApi';

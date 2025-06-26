@@ -17,25 +17,25 @@ import type {
 
 /**
  * @export
- * @interface ApiTodosBatchPostRequest
+ * @interface BatchOperation
  */
-export interface ApiTodosBatchPostRequest {
+export interface BatchOperation {
     /**
      * 操作类型
      * @type {string}
-     * @memberof ApiTodosBatchPostRequest
+     * @memberof BatchOperation
      */
-    action: ApiTodosBatchPostRequestActionEnum;
+    action: BatchOperationActionEnum;
     /**
      * 任务ID列表
      * @type {Array<string>}
-     * @memberof ApiTodosBatchPostRequest
+     * @memberof BatchOperation
      */
     ids: Array<string>;
     /**
      * 更新数据（仅在action为update时需要）
      * @type {UpdateTodoData}
-     * @memberof ApiTodosBatchPostRequest
+     * @memberof BatchOperation
      */
     data?: UpdateTodoData;
 }
@@ -44,7 +44,7 @@ export interface ApiTodosBatchPostRequest {
  * @export
  * @enum {string}
  */
-export enum ApiTodosBatchPostRequestActionEnum {
+export enum BatchOperationActionEnum {
     delete = 'delete',
     update = 'update'
 }

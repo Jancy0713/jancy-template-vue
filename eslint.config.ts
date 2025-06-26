@@ -40,7 +40,7 @@ export default defineConfigWithVueTs(
   },
   {
     name: 'app/custom-rules-for-swagger-service',
-    files: ['swagger-service/**/*.{ts,mts,tsx,vue}'],
+    files: ['src/service/swagger-service/**/*.{ts,mts,tsx,vue}'],
     rules: {
       '@typescript-eslint/no-unused-vars': 'off', // 完全禁用未使用变量检查
       '@typescript-eslint/prefer-as-const': 'off', // 完全禁用as const检查

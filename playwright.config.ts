@@ -28,16 +28,25 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['html', { open: 'never' }], // HTML 报告
+    ['list'], // 控制台报告
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: 0,
+    actionTimeout: 10000,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
+    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5171',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+
+    /* 截图设置 */
+    screenshot: process.env.CI ? 'only-on-failure' : 'on',
+
+    /* 视频录制设置 */
+    video: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
 
     /* Only on CI systems run the tests headless */
     headless: !!process.env.CI,
@@ -49,18 +58,21 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
       },
     },
     {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
+        viewport: { width: 1280, height: 720 },
       },
     },
     {
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
+        viewport: { width: 1280, height: 720 },
       },
     },
 
@@ -94,7 +106,7 @@ export default defineConfig({
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
+  outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
   webServer: {
@@ -104,7 +116,10 @@ export default defineConfig({
      * Playwright will re-use the local server if there is already a dev-server running.
      */
     command: process.env.CI ? 'npm run preview' : 'npm run dev',
-    port: process.env.CI ? 4173 : 5173,
+    port: process.env.CI ? 4173 : 5171,
     reuseExistingServer: !process.env.CI,
+    timeout: 120000, // 等待开发服务器启动的超时时间，设置为 2 分钟
+    stdout: 'pipe', // 将服务器输出传递到测试输出
+    stderr: 'pipe', // 将服务器错误输出传递到测试输出
   },
 })

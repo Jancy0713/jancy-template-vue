@@ -17,18 +17,18 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ApiTodosBatchPost200Response,
-    ApiTodosBatchPostRequest,
     ApiTodosGet200Response,
     ApiTodosIdDelete200Response,
     ApiTodosPost201Response,
     ApiTodosReorderPost200Response,
-    ApiTodosReorderPostRequest,
+    BatchOperation,
     CreateTodoData,
+    ReorderRequest,
     UpdateTodoData,
 } from '../models';
 
 export interface ApiTodosBatchPostRequest {
-    apiTodosBatchPostRequest: ApiTodosBatchPostRequest;
+    batchOperation: BatchOperation;
 }
 
 export interface ApiTodosGetRequest {
@@ -60,7 +60,7 @@ export interface ApiTodosPostRequest {
 }
 
 export interface ApiTodosReorderPostRequest {
-    apiTodosReorderPostRequest: ApiTodosReorderPostRequest;
+    reorderRequest: ReorderRequest;
 }
 
 /**
@@ -72,10 +72,10 @@ export class TodosApi extends BaseAPI {
      * 对多个任务执行批量操作（删除或更新）
      * 批量操作任务
      */
-    apiTodosBatchPost({ apiTodosBatchPostRequest }: ApiTodosBatchPostRequest): Observable<ApiTodosBatchPost200Response>
-    apiTodosBatchPost({ apiTodosBatchPostRequest }: ApiTodosBatchPostRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiTodosBatchPost200Response>>
-    apiTodosBatchPost({ apiTodosBatchPostRequest }: ApiTodosBatchPostRequest, opts?: OperationOpts): Observable<ApiTodosBatchPost200Response | AjaxResponse<ApiTodosBatchPost200Response>> {
-        throwIfNullOrUndefined(apiTodosBatchPostRequest, 'apiTodosBatchPostRequest', 'apiTodosBatchPost');
+    apiTodosBatchPost({ batchOperation }: ApiTodosBatchPostRequest): Observable<ApiTodosBatchPost200Response>
+    apiTodosBatchPost({ batchOperation }: ApiTodosBatchPostRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiTodosBatchPost200Response>>
+    apiTodosBatchPost({ batchOperation }: ApiTodosBatchPostRequest, opts?: OperationOpts): Observable<ApiTodosBatchPost200Response | AjaxResponse<ApiTodosBatchPost200Response>> {
+        throwIfNullOrUndefined(batchOperation, 'batchOperation', 'apiTodosBatchPost');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export class TodosApi extends BaseAPI {
             url: '/api/todos/batch',
             method: 'POST',
             headers,
-            body: apiTodosBatchPostRequest,
+            body: batchOperation,
         }, opts?.responseOpts);
     };
 
@@ -192,10 +192,10 @@ export class TodosApi extends BaseAPI {
      * 批量更新任务的排序顺序
      * 重新排序任务
      */
-    apiTodosReorderPost({ apiTodosReorderPostRequest }: ApiTodosReorderPostRequest): Observable<ApiTodosReorderPost200Response>
-    apiTodosReorderPost({ apiTodosReorderPostRequest }: ApiTodosReorderPostRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiTodosReorderPost200Response>>
-    apiTodosReorderPost({ apiTodosReorderPostRequest }: ApiTodosReorderPostRequest, opts?: OperationOpts): Observable<ApiTodosReorderPost200Response | AjaxResponse<ApiTodosReorderPost200Response>> {
-        throwIfNullOrUndefined(apiTodosReorderPostRequest, 'apiTodosReorderPostRequest', 'apiTodosReorderPost');
+    apiTodosReorderPost({ reorderRequest }: ApiTodosReorderPostRequest): Observable<ApiTodosReorderPost200Response>
+    apiTodosReorderPost({ reorderRequest }: ApiTodosReorderPostRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiTodosReorderPost200Response>>
+    apiTodosReorderPost({ reorderRequest }: ApiTodosReorderPostRequest, opts?: OperationOpts): Observable<ApiTodosReorderPost200Response | AjaxResponse<ApiTodosReorderPost200Response>> {
+        throwIfNullOrUndefined(reorderRequest, 'reorderRequest', 'apiTodosReorderPost');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ export class TodosApi extends BaseAPI {
             url: '/api/todos/reorder',
             method: 'POST',
             headers,
-            body: apiTodosReorderPostRequest,
+            body: reorderRequest,
         }, opts?.responseOpts);
     };
 

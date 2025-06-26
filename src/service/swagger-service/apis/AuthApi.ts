@@ -152,7 +152,7 @@ export class AuthApi extends BaseAPI {
     };
 
     /**
-     * 创建新的用户账户
+     * 创建新的用户账户。用户名可选，如果不提供将使用邮箱前缀作为默认用户名。如果用户名已存在，系统会自动添加数字后缀确保唯一性。
      * 用户注册
      */
     apiAuthRegisterPost({ registerRequest }: ApiAuthRegisterPostRequest): Observable<AuthResponse>
