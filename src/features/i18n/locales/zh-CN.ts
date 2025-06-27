@@ -15,6 +15,15 @@ export default {
     success: '操作成功',
     failed: '操作失败',
     switchLanguage: '切换语言',
+    error: {
+      unknown: '未知错误',
+      network: '网络错误',
+      timeout: '请求超时',
+      serverError: '服务器错误',
+      unauthorized: '未授权访问',
+      forbidden: '禁止访问',
+      notFound: '资源不存在',
+    },
   },
   theme: {
     light: '浅色模式',
@@ -258,6 +267,34 @@ export default {
           all: '暂无已完成任务',
         },
       },
+    },
+  },
+  home: {
+    title: 'Jancy Template Vue',
+    subtitle: '基于 Vue 3 + TypeScript + Element Plus 的项目模板',
+    features: {
+      todoList: {
+        title: 'TODO List',
+        description: '功能完整的待办事项管理系统，支持任务分类、优先级、标签管理、筛选排序等功能',
+        featureList: {
+          crud: '任务增删改查',
+          management: '优先级和状态管理',
+          tags: '标签分类',
+          filter: '搜索和筛选',
+          storage: '本地存储',
+        },
+      },
+      comingSoon: {
+        title: '更多功能',
+        description: '更多功能模块正在开发中...',
+        badge: '敬请期待',
+      },
+    },
+    techStack: {
+      title: '技术栈',
+    },
+    messages: {
+      loginRequired: '请先登录',
     },
   },
 }

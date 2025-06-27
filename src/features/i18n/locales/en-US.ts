@@ -15,6 +15,15 @@ export default {
     success: 'Operation Successful',
     failed: 'Operation Failed',
     switchLanguage: 'Switch Language',
+    error: {
+      unknown: 'Unknown Error',
+      network: 'Network Error',
+      timeout: 'Request Timeout',
+      serverError: 'Server Error',
+      unauthorized: 'Unauthorized Access',
+      forbidden: 'Access Forbidden',
+      notFound: 'Resource Not Found',
+    },
   },
   theme: {
     light: 'Light Mode',
@@ -259,6 +268,35 @@ export default {
           all: 'No completed tasks',
         },
       },
+    },
+  },
+  home: {
+    title: 'Jancy Template Vue',
+    subtitle: 'Project template based on Vue 3 + TypeScript + Element Plus',
+    features: {
+      todoList: {
+        title: 'TODO List',
+        description:
+          'Full-featured todo management system with task categorization, priority levels, tag management, filtering and sorting',
+        featureList: {
+          crud: 'Task CRUD operations',
+          management: 'Priority and status management',
+          tags: 'Tag categorization',
+          filter: 'Search and filtering',
+          storage: 'Local storage',
+        },
+      },
+      comingSoon: {
+        title: 'More Features',
+        description: 'More feature modules are under development...',
+        badge: 'Coming Soon',
+      },
+    },
+    techStack: {
+      title: 'Tech Stack',
+    },
+    messages: {
+      loginRequired: 'Please login first',
     },
   },
 }

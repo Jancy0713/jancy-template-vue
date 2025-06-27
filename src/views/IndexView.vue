@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ElContainer, ElHeader, ElMain, ElCard, ElIcon, ElTag } from 'element-plus'
+import { ElContainer, ElHeader, ElMain, ElCard, ElIcon, ElTag, ElMessage } from 'element-plus'
 import { House, Calendar, DocumentAdd } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/AppHeader.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const { t } = useI18n()
 
 const techStack = [
   { name: 'Vue 3', type: 'primary' },
@@ -16,6 +20,12 @@ const techStack = [
 ] as const
 
 const goToTodoList = () => {
+  // 检查用户是否已登录
+  if (!authStore.token || authStore.isTokenExpired()) {
+    ElMessage.warning(t('home.messages.loginRequired'))
+    return
+  }
+
   router.push('/todolist')
 }
 </script>
@@ -31,9 +41,9 @@ const goToTodoList = () => {
               <el-icon :size="32" color="#409EFF">
                 <House />
               </el-icon>
-              Jancy Template Vue
+              {{ t('home.title') }}
             </h1>
-            <p class="index-header__subtitle">基于 Vue 3 + TypeScript + Element Plus 的项目模板</p>
+            <p class="index-header__subtitle">{{ t('home.subtitle') }}</p>
           </div>
         </el-header>
 
@@ -46,16 +56,16 @@ const goToTodoList = () => {
                     <Calendar />
                   </el-icon>
                 </div>
-                <h3 class="feature-card__title">TODO List</h3>
+                <h3 class="feature-card__title">{{ t('home.features.todoList.title') }}</h3>
                 <p class="feature-card__description">
-                  功能完整的待办事项管理系统，支持任务分类、优先级、标签管理、筛选排序等功能
+                  {{ t('home.features.todoList.description') }}
                 </p>
                 <ul class="feature-card__features">
-                  <li>✅ 任务增删改查</li>
-                  <li>✅ 优先级和状态管理</li>
-                  <li>✅ 标签分类</li>
-                  <li>✅ 搜索和筛选</li>
-                  <li>✅ 本地存储</li>
+                  <li>✅ {{ t('home.features.todoList.featureList.crud') }}</li>
+                  <li>✅ {{ t('home.features.todoList.featureList.management') }}</li>
+                  <li>✅ {{ t('home.features.todoList.featureList.tags') }}</li>
+                  <li>✅ {{ t('home.features.todoList.featureList.filter') }}</li>
+                  <li>✅ {{ t('home.features.todoList.featureList.storage') }}</li>
                 </ul>
               </div>
             </el-card>
@@ -67,15 +77,17 @@ const goToTodoList = () => {
                     <DocumentAdd />
                   </el-icon>
                 </div>
-                <h3 class="feature-card__title">更多功能</h3>
-                <p class="feature-card__description">更多功能模块正在开发中...</p>
-                <el-tag type="info" size="small">敬请期待</el-tag>
+                <h3 class="feature-card__title">{{ t('home.features.comingSoon.title') }}</h3>
+                <p class="feature-card__description">
+                  {{ t('home.features.comingSoon.description') }}
+                </p>
+                <el-tag type="info" size="small">{{ t('home.features.comingSoon.badge') }}</el-tag>
               </div>
             </el-card>
           </div>
 
           <div class="tech-stack">
-            <h2 class="tech-stack__title">技术栈</h2>
+            <h2 class="tech-stack__title">{{ t('home.techStack.title') }}</h2>
             <div class="tech-stack__items">
               <el-tag
                 v-for="tech in techStack"

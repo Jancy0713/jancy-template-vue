@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { authApi } from '@/utils/request'
-import { getI18n } from '@/features/i18n/config'
+import { authApi, withErrorHandling } from '@/utils/request'
 import type {
   User,
   LoginRequest,
@@ -66,7 +64,10 @@ export const useAuthStore = defineStore('auth', () => {
         email: params.email,
         password: params.password,
       }
-      const response = await firstValueFrom(authApi.apiAuthLoginPost({ loginRequest }))
+      const response = await firstValueFrom(
+        withErrorHandling(authApi.apiAuthLoginPost({ loginRequest })),
+      )
+
       const data = response.data
       if (data) {
         const { token: newToken, refreshToken: newRefreshToken, user } = data
@@ -75,15 +76,11 @@ export const useAuthStore = defineStore('auth', () => {
           setUserInfo(user || null)
           email.value = params.email
           localStorage.setItem('email', params.email)
-          ElMessage.success(getI18n().t('auth.login.success'))
           return data
         }
       }
-      // 打印调试信息
-      console.error('Login接口返回异常:', response)
-      throw new Error('Login response data is empty')
     } catch (error: any) {
-      showErrorMessage(error.message)
+      // 错误已在withErrorHandling中统一处理
       throw error
     }
   }
@@ -96,7 +93,9 @@ export const useAuthStore = defineStore('auth', () => {
         password: params.password,
         confirm_password: params.password,
       }
-      const response = await firstValueFrom(authApi.apiAuthRegisterPost({ registerRequest }))
+      const response = await firstValueFrom(
+        withErrorHandling(authApi.apiAuthRegisterPost({ registerRequest })),
+      )
       const data = response.data
       if (data) {
         const { token: newToken, refreshToken: newRefreshToken, user } = data
@@ -105,15 +104,12 @@ export const useAuthStore = defineStore('auth', () => {
           setUserInfo(user || null)
           email.value = params.email
           localStorage.setItem('email', params.email)
-          ElMessage.success(getI18n().t('auth.register.success'))
           return data
         }
       }
-      // 打印调试信息
-      console.error('Register接口返回异常:', response)
       throw new Error('Register response data is empty')
     } catch (error: any) {
-      showErrorMessage(error.message)
+      // 错误已在withErrorHandling中统一处理
       throw error
     }
   }
@@ -121,14 +117,14 @@ export const useAuthStore = defineStore('auth', () => {
   // 获取用户信息
   const getUserInfo = async () => {
     try {
-      const response = await firstValueFrom(authApi.apiAuthProfileGet())
+      const response = await firstValueFrom(withErrorHandling(authApi.apiAuthProfileGet()))
       if (response.data) {
         setUserInfo(response.data)
         return response.data
       }
       throw new Error('User info response data is empty')
     } catch (error: any) {
-      console.error('Failed to get user info:', error)
+      // 错误已在withErrorHandling中统一处理
       throw error
     }
   }
@@ -136,13 +132,13 @@ export const useAuthStore = defineStore('auth', () => {
   // 登出
   const logout = async () => {
     try {
-      await firstValueFrom(authApi.apiAuthLogoutPost({}))
+      await firstValueFrom(withErrorHandling(authApi.apiAuthLogoutPost({})))
       setToken('', '')
       setUserInfo(null)
       email.value = ''
       localStorage.removeItem('email')
     } catch (error: any) {
-      showErrorMessage(error.message)
+      // 错误已在withErrorHandling中统一处理，即使登出失败也要清除本地数据
       setToken('', '')
       setUserInfo(null)
       email.value = ''
@@ -158,22 +154,18 @@ export const useAuthStore = defineStore('auth', () => {
         password: params.password,
         confirmText: params.confirmText,
       }
-      await firstValueFrom(authApi.apiAuthDeleteAccountDelete({ deleteAccountRequest }))
+      await firstValueFrom(
+        withErrorHandling(authApi.apiAuthDeleteAccountDelete({ deleteAccountRequest })),
+      )
       // 注销成功后，清除所有用户数据
       setToken('', '')
       setUserInfo(null)
       email.value = ''
       localStorage.removeItem('email')
-      ElMessage.success(getI18n().t('auth.deleteAccount.success'))
     } catch (error: any) {
-      showErrorMessage(error.message)
+      // 错误已在withErrorHandling中统一处理
       throw error
     }
-  }
-
-  // 显示错误信息
-  const showErrorMessage = (message: string) => {
-    ElMessage.error(message)
   }
 
   return {
@@ -190,6 +182,5 @@ export const useAuthStore = defineStore('auth', () => {
     getUserInfo,
     logout,
     deleteAccount,
-    showErrorMessage,
   }
 })
