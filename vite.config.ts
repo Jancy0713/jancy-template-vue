@@ -16,7 +16,8 @@ export default defineConfig({
   },
   server: {
     host: true, // 启用局域网访问
-    port: 5170, // 设置固定端口
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5170, // 默认使用 6174 端口
+    strictPort: true, // 如果端口被占用，不要自动尝试下一个端口
     open: false, // 不自动打开浏览器
     proxy: {
       '/api': {

@@ -7,6 +7,7 @@ import type { AjaxResponse } from 'rxjs/ajax'
 import type {
   AuthResponse,
   ApiAuthLogoutPost200Response,
+  ApiAuthDeleteAccountDelete200Response,
   User,
 } from '@/service/swagger-service/models'
 
@@ -279,6 +280,94 @@ describe('Auth Store', () => {
       expect(localStorage.getItem('token')).toBeNull()
       expect(localStorage.getItem('refreshToken')).toBeNull()
       expect(localStorage.getItem('email')).toBeNull()
+    })
+  })
+
+  describe('deleteAccount', () => {
+    it('注销账号成功应该清除所有用户数据', async () => {
+      const store = useAuthStore()
+      // 先设置一些用户数据
+      store.setToken('test-token', 'test-refresh-token')
+      store.setUserInfo({
+        id: 1,
+        email: 'test@example.com',
+        name: 'Test User',
+        avatar: 'https://example.com/avatar.jpg',
+      })
+      store.email = 'test@example.com'
+      localStorage.setItem('email', 'test@example.com')
+
+      const mockResponse: AjaxResponse<ApiAuthDeleteAccountDelete200Response> = {
+        response: {
+          success: true,
+          message: 'Account deleted successfully',
+        },
+        originalEvent: new ProgressEvent('load'),
+        xhr: new XMLHttpRequest(),
+        request: {
+          url: '/api/auth/delete-account',
+          method: 'DELETE',
+          async: true,
+          headers: {},
+          timeout: 0,
+          crossDomain: true,
+          withCredentials: false,
+          responseType: 'json',
+        },
+        type: 'download_load',
+        status: 200,
+        responseType: 'json',
+        loaded: 0,
+        total: 0,
+        responseHeaders: {},
+      }
+
+      vi.spyOn(authApi, 'apiAuthDeleteAccountDelete').mockReturnValue(of(mockResponse))
+
+      await store.deleteAccount({
+        password: 'password123',
+        confirmText: 'DELETE MY ACCOUNT',
+      })
+
+      // 验证所有用户数据是否被清除
+      expect(store.token).toBe('')
+      expect(store.refreshToken).toBe('')
+      expect(store.userInfo).toBeNull()
+      expect(store.email).toBe('')
+      expect(localStorage.getItem('token')).toBeNull()
+      expect(localStorage.getItem('refreshToken')).toBeNull()
+      expect(localStorage.getItem('email')).toBeNull()
+    })
+
+    it('注销账号失败应该抛出错误', async () => {
+      const store = useAuthStore()
+
+      vi.spyOn(authApi, 'apiAuthDeleteAccountDelete').mockReturnValue(
+        throwError(() => new Error('Delete account failed')),
+      )
+
+      await expect(
+        store.deleteAccount({
+          password: 'wrong-password',
+          confirmText: 'DELETE MY ACCOUNT',
+        }),
+      ).rejects.toThrow('Delete account failed')
+    })
+
+    it('注销默认账号应该失败', async () => {
+      const store = useAuthStore()
+      store.email = 'admin@example.com'
+
+      vi.spyOn(authApi, 'apiAuthDeleteAccountDelete').mockReturnValue(
+        throwError(() => new Error('Cannot delete default test accounts')),
+      )
+
+      await expect(
+        store.deleteAccount({
+          password: 'admin123',
+          confirmText: 'DELETE MY ACCOUNT',
+        }),
+      ).rejects.toThrow('Cannot delete default test accounts')
     })
   })
 })

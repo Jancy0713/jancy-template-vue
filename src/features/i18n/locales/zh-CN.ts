@@ -61,7 +61,14 @@ export default {
       nicknameRequired: '请输入昵称',
       nicknameLength: '昵称长度不能小于2个字符',
     },
-    loginOrRegister: '登录/注册',
+    deleteAccount: {
+      title: '注销账号',
+      warning: '此操作不可恢复，所有数据将被永久删除。请谨慎操作！',
+      confirmText: '请输入 "DELETE MY ACCOUNT" 确认注销',
+      confirmTextPlaceholder: '输入 DELETE MY ACCOUNT 以确认',
+      submit: '注销',
+      success: '账号已注销，欢迎再次使用！',
+    },
   },
   api: {
     request: {

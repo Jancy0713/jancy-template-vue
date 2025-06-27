@@ -9,6 +9,7 @@ apis/TodosApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/ApiAuthDeleteAccountDelete200Response.ts
 models/ApiAuthLogoutPost200Response.ts
 models/ApiAuthProfileGet200Response.ts
 models/ApiAuthProfilePut200Response.ts
@@ -39,6 +40,7 @@ models/AuthResponseData.ts
 models/BatchOperation.ts
 models/CreateTagData.ts
 models/CreateTodoData.ts
+models/DeleteAccountRequest.ts
 models/ErrorResponse.ts
 models/Get200Response.ts
 models/Get200ResponseEndpoints.ts

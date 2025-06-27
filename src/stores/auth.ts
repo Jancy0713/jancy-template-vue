@@ -7,10 +7,9 @@ import type {
   User,
   LoginRequest,
   RegisterRequest,
-  AuthResponse,
+  DeleteAccountRequest,
 } from '@/service/swagger-service/models'
 import { firstValueFrom } from 'rxjs'
-import type { AjaxResponse } from 'rxjs/ajax'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string>('')
@@ -67,20 +66,21 @@ export const useAuthStore = defineStore('auth', () => {
         email: params.email,
         password: params.password,
       }
-      const response = (await firstValueFrom(
-        authApi.apiAuthLoginPost({ loginRequest }),
-      )) as AjaxResponse<AuthResponse>
-      if (response?.response?.data) {
-        const { token: newToken, refreshToken: newRefreshToken, user } = response.response.data
-        if (newToken && user) {
+      const response = await firstValueFrom(authApi.apiAuthLoginPost({ loginRequest }))
+      const data = response.data
+      if (data) {
+        const { token: newToken, refreshToken: newRefreshToken, user } = data
+        if (newToken) {
           setToken(newToken, newRefreshToken || '')
-          setUserInfo(user)
+          setUserInfo(user || null)
           email.value = params.email
           localStorage.setItem('email', params.email)
           ElMessage.success(getI18n().t('auth.login.success'))
-          return response.response.data
+          return data
         }
       }
+      // 打印调试信息
+      console.error('Login接口返回异常:', response)
       throw new Error('Login response data is empty')
     } catch (error: any) {
       showErrorMessage(error.message)
@@ -96,20 +96,21 @@ export const useAuthStore = defineStore('auth', () => {
         password: params.password,
         confirm_password: params.password,
       }
-      const response = (await firstValueFrom(
-        authApi.apiAuthRegisterPost({ registerRequest }),
-      )) as AjaxResponse<AuthResponse>
-      if (response?.response?.data) {
-        const { token: newToken, refreshToken: newRefreshToken, user } = response.response.data
-        if (newToken && user) {
+      const response = await firstValueFrom(authApi.apiAuthRegisterPost({ registerRequest }))
+      const data = response.data
+      if (data) {
+        const { token: newToken, refreshToken: newRefreshToken, user } = data
+        if (newToken) {
           setToken(newToken, newRefreshToken || '')
-          setUserInfo(user)
+          setUserInfo(user || null)
           email.value = params.email
           localStorage.setItem('email', params.email)
           ElMessage.success(getI18n().t('auth.register.success'))
-          return response.response.data
+          return data
         }
       }
+      // 打印调试信息
+      console.error('Register接口返回异常:', response)
       throw new Error('Register response data is empty')
     } catch (error: any) {
       showErrorMessage(error.message)
@@ -150,6 +151,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // 注销账号
+  const deleteAccount = async (params: DeleteAccountRequest) => {
+    try {
+      const deleteAccountRequest: DeleteAccountRequest = {
+        password: params.password,
+        confirmText: params.confirmText,
+      }
+      await firstValueFrom(authApi.apiAuthDeleteAccountDelete({ deleteAccountRequest }))
+      // 注销成功后，清除所有用户数据
+      setToken('', '')
+      setUserInfo(null)
+      email.value = ''
+      localStorage.removeItem('email')
+      ElMessage.success(getI18n().t('auth.deleteAccount.success'))
+    } catch (error: any) {
+      showErrorMessage(error.message)
+      throw error
+    }
+  }
+
   // 显示错误信息
   const showErrorMessage = (message: string) => {
     ElMessage.error(message)
@@ -168,6 +189,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     getUserInfo,
     logout,
+    deleteAccount,
     showErrorMessage,
   }
 })

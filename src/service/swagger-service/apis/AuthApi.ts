@@ -16,10 +16,12 @@ import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
+    ApiAuthDeleteAccountDelete200Response,
     ApiAuthLogoutPost200Response,
     ApiAuthProfileGet200Response,
     ApiAuthProfilePut200Response,
     AuthResponse,
+    DeleteAccountRequest,
     ErrorResponse,
     LoginRequest,
     LogoutRequest,
@@ -28,6 +30,10 @@ import type {
     RegisterRequest,
     UpdateUserRequest,
 } from '../models';
+
+export interface ApiAuthDeleteAccountDeleteRequest {
+    deleteAccountRequest: DeleteAccountRequest;
+}
 
 export interface ApiAuthLoginPostRequest {
     loginRequest: LoginRequest;
@@ -53,6 +59,27 @@ export interface ApiAuthRegisterPostRequest {
  * no description
  */
 export class AuthApi extends BaseAPI {
+
+    /**
+     * 永久删除用户账号及相关数据。此操作不可逆，主要用于e2e测试中清理测试数据。
+     * 注销账号
+     */
+    apiAuthDeleteAccountDelete({ deleteAccountRequest }: ApiAuthDeleteAccountDeleteRequest): Observable<ApiAuthDeleteAccountDelete200Response>
+    apiAuthDeleteAccountDelete({ deleteAccountRequest }: ApiAuthDeleteAccountDeleteRequest, opts?: OperationOpts): Observable<AjaxResponse<ApiAuthDeleteAccountDelete200Response>>
+    apiAuthDeleteAccountDelete({ deleteAccountRequest }: ApiAuthDeleteAccountDeleteRequest, opts?: OperationOpts): Observable<ApiAuthDeleteAccountDelete200Response | AjaxResponse<ApiAuthDeleteAccountDelete200Response>> {
+        throwIfNullOrUndefined(deleteAccountRequest, 'deleteAccountRequest', 'apiAuthDeleteAccountDelete');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<ApiAuthDeleteAccountDelete200Response>({
+            url: '/api/auth/delete-account',
+            method: 'DELETE',
+            headers,
+            body: deleteAccountRequest,
+        }, opts?.responseOpts);
+    };
 
     /**
      * 用户使用邮箱和密码登录系统

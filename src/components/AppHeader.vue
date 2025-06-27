@@ -15,6 +15,7 @@ const authStore = useAuthStore()
 
 const showLoginDialog = ref(false)
 const isLoginMode = ref(true)
+const showDeleteAccount = ref(false)
 const isLoggedIn = computed(() => !!authStore.token)
 
 const goHome = () => {
@@ -39,7 +40,7 @@ const showRegister = () => {
   showLoginDialog.value = true
 }
 
-const handleCommand = (command: string) => {
+const handleCommand = async (command: string) => {
   switch (command) {
     case 'profile':
       // TODO: 实现个人资料功能
@@ -48,7 +49,9 @@ const handleCommand = (command: string) => {
       toggleLocale()
       break
     case 'logout':
-      authStore.logout()
+      await authStore.logout()
+      showDeleteAccount.value = true
+      showLoginDialog.value = true
       break
   }
 }
@@ -99,7 +102,12 @@ const handleCommand = (command: string) => {
       </template>
     </div>
 
-    <auth-dialog v-model="showLoginDialog" :is-login-mode="isLoginMode" />
+    <auth-dialog
+      v-model="showLoginDialog"
+      :is-login-mode="isLoginMode"
+      :show-delete-account="showDeleteAccount"
+      @success="showDeleteAccount = false"
+    />
   </header>
 </template>
 

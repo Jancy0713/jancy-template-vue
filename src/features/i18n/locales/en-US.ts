@@ -61,7 +61,15 @@ export default {
       nicknameRequired: 'Please enter nickname',
       nicknameLength: 'Nickname must be at least 2 characters',
     },
-    loginOrRegister: 'Login/Register',
+    deleteAccount: {
+      title: 'Delete Account',
+      warning:
+        'This action is irreversible. All your data will be permanently deleted. Please proceed with caution!',
+      confirmText: 'Please enter "DELETE MY ACCOUNT" to confirm',
+      confirmTextPlaceholder: 'Enter DELETE MY ACCOUNT to confirm',
+      submit: 'Delete',
+      success: 'Account deleted. Welcome back anytime!',
+    },
   },
   api: {
     request: {

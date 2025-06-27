@@ -1,3 +1,4 @@
+export * from './ApiAuthDeleteAccountDelete200Response';
 export * from './ApiAuthLogoutPost200Response';
 export * from './ApiAuthProfileGet200Response';
 export * from './ApiAuthProfilePut200Response';
@@ -28,6 +29,7 @@ export * from './AuthResponseData';
 export * from './BatchOperation';
 export * from './CreateTagData';
 export * from './CreateTodoData';
+export * from './DeleteAccountRequest';
 export * from './ErrorResponse';
 export * from './Get200Response';
 export * from './Get200ResponseEndpoints';
